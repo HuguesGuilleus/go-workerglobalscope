@@ -13,6 +13,8 @@ func main() {
 	console.Log("Hidden message")
 	console.Clear()
 
+	console.Group("Console")
+
 	console.Log("Log", 42, 36.125, true)
 	console.Warn("Warn", 42, 36.125, true)
 	console.Error("Error", 42, 36.125, true)
@@ -26,13 +28,17 @@ func main() {
 	console.TimeLog("timer", "here")
 	console.TimeEnd("timer")
 
+	console.GroupEnd()
+
 	// Fetch
 	rep := fetch.Fetch("README.md")
 
 	// Print the headers
+	console.Group("Headers:")
 	for k, v := range rep.Headers.Map() {
-		console.Log("header:", k, v)
+		console.Log(k, v)
 	}
+	console.GroupEnd()
 
 	// Hash the body and print it in hexadecimal.
 	h := sha256.New()

@@ -25,6 +25,16 @@ func TimeLog(id string, args ...interface{}) {
 	console.Call("timeLog", append([]interface{}{id}, args...)...)
 }
 
+func Group(label string) {
+	console.Call("group", label)
+}
+func GroupCollapsed(label string) {
+	console.Call("groupCollapsed", label)
+}
+func GroupEnd() {
+	console.Call("groupEnd")
+}
+
 // If condition is false, print the args with Error.
 func Assert(condition bool, args ...interface{}) {
 	if condition == false {
