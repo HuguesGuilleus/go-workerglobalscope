@@ -1,7 +1,11 @@
 package main
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"github.com/HuguesGuilleus/go-workerglobalscope/console"
+	"github.com/HuguesGuilleus/go-workerglobalscope/fetch"
+	"io"
 )
 
 func main() {
@@ -21,4 +25,17 @@ func main() {
 	console.Time("timer")
 	console.TimeLog("timer", "here")
 	console.TimeEnd("timer")
+
+	// Fetch
+	rep := fetch.Fetch("README.md")
+
+	// Print the headers
+	for k, v := range rep.Headers.Map() {
+		console.Log("header:", k, v)
+	}
+
+	// Hash the body and print it in hexadecimal.
+	h := sha256.New()
+	io.Copy(h, rep.Reader())
+	console.Log("body sha256 hash:", hex.EncodeToString(h.Sum(nil)))
 }
