@@ -8,6 +8,14 @@
 		// Create a new Worker with the Go glue for web assembly and
 		// us code to download an run the WebAssmbly (at the end of the file).
 		const w = new Worker('worker.js');
+		// Print the data of the sended message from the worker.
+		w.onmessage = ms => console.log('main receive message:', ms.data);
+		// use a delay to wait worker and webAssembly load.
+		// In real word, wait a init message from the worker
+		// and then begin the exchange.
+		setTimeout(function () {
+			w.postMessage('Hello little worker.');
+		}, 500);
 	</script>
 </head>
 

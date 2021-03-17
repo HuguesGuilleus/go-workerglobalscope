@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"github.com/HuguesGuilleus/go-workerglobalscope/console"
 	"github.com/HuguesGuilleus/go-workerglobalscope/fetch"
+	"github.com/HuguesGuilleus/go-workerglobalscope/message"
 	"io"
 )
 
@@ -44,4 +45,11 @@ func main() {
 	h := sha256.New()
 	io.Copy(h, rep.Reader())
 	console.Log("body sha256 hash:", hex.EncodeToString(h.Sum(nil)))
+
+	message.Post(42)
+
+	// message.Post(js.ValueOf(42))
+	for m := range message.Event {
+		console.Log(m)
+	}
 }
