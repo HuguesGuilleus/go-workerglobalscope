@@ -5,22 +5,24 @@
 package message
 
 import (
+	"github.com/HuguesGuilleus/go-workerglobalscope/reflectjs"
 	"syscall/js"
 )
 
 var postMessage = js.Global().Get("postMessage")
 
-// Send a message to the parent of this worker.
+// Send a message to the parent of this worker. Before the message m is
+// transform to Js value with reflectjs.ToJs function.
 //
 //	self.postMessage(m) // in Javascript
 func Post(m interface{}) {
-	postMessage.Invoke(m)
+	postMessage.Invoke(reflectjs.ToJs(m))
 }
 
 // Send the field data of the message.
 //
-// It use self.addEventListener method, so several eventhandler can be used.
-var Event <-chan js.Value = func() <-chan js.Value {
+// It use self.addEventListener method, so several event handlers can be used.
+func Listen() <-chan js.Value {
 	c := make(chan js.Value)
 
 	js.Global().Call("addEventListener", "message", js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
@@ -29,4 +31,4 @@ var Event <-chan js.Value = func() <-chan js.Value {
 	}))
 
 	return c
-}()
+}

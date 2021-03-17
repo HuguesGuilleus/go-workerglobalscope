@@ -31,12 +31,15 @@ type Response struct {
 
 func Await(promise js.Value) (resolve js.Value) {
 	c := make(chan struct{})
+	defer close(c)
 
-	promise.Call("then", js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+	f := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
 		resolve = args[0]
 		c <- struct{}{}
 		return nil
-	}))
+	})
+	defer f.Release()
+	promise.Call("then", f)
 
 	<-c
 
