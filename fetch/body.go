@@ -5,11 +5,10 @@
 package fetch
 
 import (
+	"github.com/HuguesGuilleus/go-workerglobalscope/reflectjs/uint8array"
 	"io"
 	"syscall/js"
 )
-
-var Uint8Array = js.Global().Get("Uint8Array")
 
 // You can use it with a response, a Blob for example.
 //
@@ -26,7 +25,7 @@ func (b *Body) Text() string {
 // Get an array buffer of the Body, and to each call of Read copy the bytes
 // into the destination []byte.
 func (b *Body) Reader() io.Reader {
-	a := Uint8Array.New(Await(b.Call("arrayBuffer")))
+	a := uint8array.Uint8Array.New(Await(b.Call("arrayBuffer")))
 	return &bodyReader{
 		array: a,
 		size:  a.Get("byteLength").Int(),

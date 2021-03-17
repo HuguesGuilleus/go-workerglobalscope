@@ -7,6 +7,7 @@ import (
 	"github.com/HuguesGuilleus/go-workerglobalscope/fetch"
 	"github.com/HuguesGuilleus/go-workerglobalscope/message"
 	"io"
+	"time"
 )
 
 func main() {
@@ -46,10 +47,43 @@ func main() {
 	io.Copy(h, rep.Reader())
 	console.Log("body sha256 hash:", hex.EncodeToString(h.Sum(nil)))
 
-	message.Post(42)
+	s := &struct {
+		Array      [2]time.Time
+		Bool       bool
+		BigInt     int64
+		Float      float64
+		Set        map[string]bool
+		Int        int
+		Lang       map[string]string
+		String     string
+		Slice      []time.Time
+		Time       time.Time
+		unexported string
+	}{
+		Array:  [2]time.Time{time.Now()},
+		Bool:   true,
+		BigInt: int64(0xFFFF_FFFF),
+		Float:  56.89,
+		Set: map[string]bool{
+			"Hello": true,
+			"Hola":  true,
+			"Salut": true,
+		},
+		Int: 42,
+		Lang: map[string]string{
+			"en": "English",
+			"es": "Español",
+			"fr": "Français",
+		},
+		String:     "Yolo!",
+		Slice:      []time.Time{time.Now().Add(-24 * time.Hour)},
+		Time:       time.Now(),
+		unexported: "Hello World",
+	}
 
-	// message.Post(js.ValueOf(42))
-	for m := range message.Event {
+	message.Post(&s)
+
+	for m := range message.Listen() {
 		console.Log(m)
 	}
 }
