@@ -95,7 +95,11 @@ func toJsReflect(v reflect.Value) js.Value {
 		for i := 0; i < num; i++ {
 			f := t.Field(i)
 			if f.PkgPath == "" {
-				obj.Set(f.Name, ToJs(v.Field(i).Interface()))
+				n := f.Name
+				if nn := f.Tag.Get("js"); nn != "" {
+					n = nn
+				}
+				obj.Set(n, ToJs(v.Field(i).Interface()))
 			}
 		}
 		return obj

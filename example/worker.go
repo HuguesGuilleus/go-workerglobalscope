@@ -59,6 +59,7 @@ func main() {
 		Slice      []time.Time
 		Time       time.Time
 		unexported string
+		Lower      int `js:"lower"`
 	}{
 		Array:  [2]time.Time{time.Now()},
 		Bool:   true,
@@ -79,6 +80,7 @@ func main() {
 		Slice:      []time.Time{time.Now().Add(-24 * time.Hour)},
 		Time:       time.Now(),
 		unexported: "Hello World",
+		Lower:      54,
 	}
 
 	message.Post(&s)
