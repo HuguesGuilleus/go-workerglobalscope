@@ -5,7 +5,7 @@
 package reflectjs
 
 import (
-	"github.com/HuguesGuilleus/go-workerglobalscope/reflectjs/uint8array"
+	"github.com/HuguesGuilleus/go-workerglobalscope"
 	"reflect"
 	"strconv"
 	"syscall/js"
@@ -30,6 +30,12 @@ import (
 //  | []... (slice or array) | Array                  |
 //
 // Other type like function or channel panics.
+//
+// Struct field support tag:
+//
+//	struct{
+//		Int int `js:"int"`
+//	}
 func ToJs(v interface{}) js.Value {
 	switch v := v.(type) {
 	case js.Value:
@@ -46,13 +52,9 @@ func ToJs(v interface{}) js.Value {
 	case int64:
 		return BigInt.Invoke(strconv.FormatInt(v, 10))
 	case []byte:
-		return uint8array.New(v)
+		return ws.NewUint8Array(v)
 	case time.Time:
-		if v.IsZero() {
-			return Date.New(0)
-		}
-		j, _ := v.MarshalText()
-		return Date.New(string(j))
+		return ws.NewDate(v)
 	default:
 		return toJsReflect(reflect.ValueOf(v))
 	}
@@ -66,7 +68,7 @@ func toJsReflect(v reflect.Value) js.Value {
 
 	case reflect.Array, reflect.Slice:
 		l := v.Len()
-		array := Array.New(l)
+		array := ws.Array.New(l)
 		for i := 0; i < l; i++ {
 			array.SetIndex(i, ToJs(v.Index(i).Interface()))
 		}
@@ -90,7 +92,7 @@ func toJsReflect(v reflect.Value) js.Value {
 		}
 
 	case reflect.Struct:
-		obj := Object.New()
+		obj := ws.Object.New()
 		num := v.Type().NumField()
 		for i := 0; i < num; i++ {
 			f := t.Field(i)
@@ -111,9 +113,6 @@ func toJsReflect(v reflect.Value) js.Value {
 
 var (
 	BigInt js.Value = js.Global().Get("BigInt")
-	Date   js.Value = js.Global().Get("Date")
-	Object js.Value = js.Global().Get("Object")
-	Array  js.Value = js.Global().Get("Array")
 	Map    js.Value = js.Global().Get("Map")
 	Set    js.Value = js.Global().Get("Set")
 )

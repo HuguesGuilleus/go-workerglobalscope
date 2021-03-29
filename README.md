@@ -1,8 +1,6 @@
 # go-workerglobalscope
 
-A wrapper for the WorkerGlobalScope, for go in WebAssembly. The console package and the fetch package can be used in *main js worker*, not only in a Worker.
-
-To minimise some init syscall, we separate the API in different package.
+A wrapper for go in WebAssembly in a Worker context to expose some API (console, fetch) and some Js value (Date, Uint8Array). The console package and the fetch package can be used in *main js worker*, not only in a Worker.
 
 ## Warning
 

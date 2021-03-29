@@ -5,7 +5,7 @@
 package fetch
 
 import (
-	"github.com/HuguesGuilleus/go-workerglobalscope/reflectjs/uint8array"
+	"github.com/HuguesGuilleus/go-workerglobalscope"
 	"io"
 	"syscall/js"
 )
@@ -25,7 +25,7 @@ func (b *Body) Text() string {
 // Get an array buffer of the Body, and to each call of Read copy the bytes
 // into the destination []byte.
 func (b *Body) Reader() io.Reader {
-	a := uint8array.Uint8Array.New(Await(b.Call("arrayBuffer")))
+	a := ws.Uint8Array.New(Await(b.Call("arrayBuffer")))
 	return &bodyReader{
 		array: a,
 		size:  a.Get("byteLength").Int(),
