@@ -1,5 +1,7 @@
 # go-workerglobalscope
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/HuguesGuilleus/go-workerglobalscope.svg)](https://pkg.go.dev/github.com/HuguesGuilleus/go-workerglobalscope)
+
 A wrapper for go in WebAssembly in a Worker context to expose some API (console, fetch) and some Js value (Date, Uint8Array). The console package and the fetch package can be used in *main js worker*, not only in a Worker.
 
 ## Warning
