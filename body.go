@@ -5,8 +5,14 @@
 package ws
 
 import (
+	"errors"
 	"io"
 	"syscall/js"
+)
+
+var (
+	NegativeOffset    = errors.New("No support for negative offset")
+	InvalidSeekWhence = errors.New("Invalid seek whence")
 )
 
 // ReadBody creates a io.Reader with the Body.arrayBuffer().
@@ -14,7 +20,12 @@ import (
 //
 // Body is a mixin for a Blob (File inherit of a Blob) or a fetch response.
 // https://fetch.spec.whatwg.org/#body
-func ReadBody(body js.Value) (io.Reader, error) {
+func ReadBody(body js.Value) (interface {
+	io.Reader
+	io.ReaderAt
+	// io.Seeker
+	js.Wrapper
+}, error) {
 	arrayBuffer, err := AwaitError(body.Call("arrayBuffer"))
 	if err != nil {
 		return nil, err
@@ -45,4 +56,36 @@ func (b *bodyReader) Read(dst []byte) (int, error) {
 	}
 	b.pos += readed
 	return readed, nil
+}
+
+func (b *bodyReader) JSValue() js.Value { return b.array }
+
+func (b *bodyReader) ReadAt(p []byte, off int64) (n int, err error) {
+	if off < 0 {
+		return 0, NegativeOffset
+	}
+	return js.CopyBytesToGo(p, b.array.Call("subarray", int(off))), nil
+}
+
+func (b *bodyReader) Seek(offset int64, whence int) (int64, error) {
+	switch whence {
+	case io.SeekStart:
+		b.pos = int(offset)
+	case io.SeekCurrent:
+		b.pos += int(offset)
+	case io.SeekEnd:
+		b.pos = b.size + int(offset)
+	default:
+		return 0, InvalidSeekWhence
+	}
+
+	if b.pos < 0 {
+		b.pos = 0
+		return 0, NegativeOffset
+	} else if b.pos > b.size {
+		b.pos = b.size
+		return 0, io.EOF
+	}
+
+	return int64(b.pos), nil
 }
